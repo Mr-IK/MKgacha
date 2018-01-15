@@ -1,0 +1,8 @@
+name: MKgacha
+version: 1.2.0
+main: mkgacha.MKgacha
+commands:
+  mkgacha:
+    description: MKallcommand.
+    usage: /<command>
+    default: op
