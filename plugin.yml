@@ -6,3 +6,10 @@ commands:
     description: MKallcommand.
     usage: /<command>
     default: op
+permissions:
+  mkgacha.config:
+    description: mkgacha-setting-permission
+    default: op
+  mkgacha.use:
+    description: mkgacha-use
+    default: true
