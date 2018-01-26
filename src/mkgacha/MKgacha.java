@@ -6,12 +6,19 @@ import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
+import org.bukkit.FireworkEffect.Type;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +32,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,7 +40,6 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 
 public class MKgacha extends JavaPlugin {
-	@SuppressWarnings("null")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!sender.hasPermission("mkgacha.config")){
@@ -86,6 +93,10 @@ public class MKgacha extends JavaPlugin {
 					 d.setItemMeta(e);
 					 inv.setItem(52, d);
 					 ItemStack f = null;
+					 if(config1.contains("gacha."+args[1]+".hand.item_money_1")==false) {
+						 config1.set("gacha."+args[1]+".hand.item_money_1","item");
+						 saveConfig();
+					 }
 					 if(config1.getString("gacha."+args[1]+".hand.item_money_1").equals("item")==true) {
 					 f = config1.getItemStack("gacha."+args[1]+".hand.item_money");
 					 }else {
@@ -105,6 +116,40 @@ public class MKgacha extends JavaPlugin {
 					}
 					p.openInventory(inv);
 					return true;
+				}
+				if(args[0].equalsIgnoreCase("config")) {
+					if(config1.contains("gacha."+args[1]) == false){
+						sender.sendMessage(prefix+"§4そのガチャは存在しません！");
+						return true;
+					}
+					Inventory inv = Bukkit.createInventory((InventoryHolder)null, 54, "§6§l[§a§lMKgachaCONFIG§6§l]");
+					 ItemStack b = new ItemStack(Material.PAPER);
+					 ItemMeta c =b.getItemMeta();
+					 c.setDisplayName(args[1]);
+					 b.setItemMeta(c);
+					 inv.setItem(53, b);
+					if(config1.contains("gacha."+args[1]+".move")==false) {
+						config1.set("gacha."+args[1]+".move","true");
+						saveConfig();
+					}
+					if(config1.getString("gacha."+args[1]+".move").equals("true")) {
+					 ItemStack a = new ItemStack(Material.EMERALD_BLOCK);
+					 ItemMeta o =a.getItemMeta();
+					 o.setDisplayName("§a§l稼働中");
+					 a.setItemMeta(o);
+					 inv.setItem(11, a);
+					}else {
+						 ItemStack a = new ItemStack(Material.REDSTONE_BLOCK);
+						 ItemMeta o =a.getItemMeta();
+						 o.setDisplayName("§4§l停止中");
+						 a.setItemMeta(o);
+						 inv.setItem(11, a);
+					}
+					if(config1.contains("gacha." + args[1] +".winitem")==true) {
+						ItemStack item2 = config1.getItemStack("gacha." + args[1] +".winitem");
+						inv.setItem(13, item2);
+					}
+					p.openInventory(inv);
 				}
 			  }
 		return true;
@@ -167,7 +212,16 @@ public class MKgacha extends JavaPlugin {
 				   if(config1.contains("gacha." + id + ".hand.item_money_1") == false) {
 					     p.sendMessage(prefix+"§4エラー: 設定が終了していません！");
 					     return;
-					     }
+				   }
+				   if(config1.contains("gacha." + id + ".move")==true) {
+				   if(config1.getString("gacha." + id + ".move") == "false") {
+					     p.sendMessage(prefix+"§4このガチャは現在稼働が停止されています！");
+					     return;
+				    }
+				   }else {
+					     p.sendMessage(prefix+"§4エラー: 設定を行ってください。 /mkgacha config "+id);
+					     return;
+				   }
 	                if(!e.getPlayer().hasPermission("mkgacha.use")){
 	                    e.getPlayer().sendMessage(prefix + "§4あなたにガチャを引く権限はありません！");
 	                    return;
@@ -279,12 +333,42 @@ public class MKgacha extends JavaPlugin {
                   	@Override
                   	public void run() {
                   p.getInventory().addItem(inv.getItem(13));
-                  p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 2.0F);
-              	if(inv.getItem(13).getItemMeta().getDisplayName() == null) {
-              	p.sendMessage(prefix+"§e§l"+inv.getItem(13).getType().toString()+"§eが§e§l"+inv.getItem(13).getAmount()+"§e個当たりました！");
-              	}else{
-              	p.sendMessage(prefix+"§r"+inv.getItem(13).getItemMeta().getDisplayName().toString()+"§eが§e§l"+inv.getItem(13).getAmount()+"§e個当たりました！");
-              	}
+                  if(config1.contains("gacha." + id +".winitem")==true) {
+                  ItemStack item = inv.getItem(13);
+                  ItemStack item2 = config1.getItemStack("gacha." + id +".winitem");
+                  if(item.getAmount() == item2.getAmount()){
+                	  if(item.getType() == item2.getType()){
+                		  if(item2.getItemMeta() == null || item.getItemMeta().toString().equalsIgnoreCase(item2.getItemMeta().toString())){
+                         	        if(inv.getItem(13).getItemMeta().getDisplayName() == null) {
+                         		     Bukkit.broadcastMessage(prefix+"§e§l"+p.getName().toString()+"さんが"+inv.getItem(13).getType().toString()+"§eを§e§l"+inv.getItem(13).getAmount()+"§e個当てました！おめでとう！");
+                             	    }else{
+                             		 Bukkit.broadcastMessage(prefix+"§6§l"+p.getName().toString()+"さんが"+inv.getItem(13).getItemMeta().getDisplayName().toString()+"§eを§e§l"+inv.getItem(13).getAmount()+"§e個当てました！おめでとう！");
+                             	    }
+                                	for (Player player : Bukkit.getOnlinePlayers()) {
+                     	            	player.getWorld().playSound(player.getLocation(),Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 2.0F);
+                                	}
+            	                    World world = e.getClickedBlock().getWorld();
+            	                    int x3 = e.getClickedBlock().getX();
+            	                    int y3 = e.getClickedBlock().getY();
+            	                    int z3 = e.getClickedBlock().getZ();
+            	                    Location location = new Location(world, x3, y3, z3);
+            	   	                Firework fireWork = (Firework) p.getWorld().spawnEntity(location, EntityType.FIREWORK);
+            	   	                FireworkMeta fwMeta = fireWork.getFireworkMeta();
+            	   	                fwMeta.addEffect(FireworkEffect.builder().flicker(false).trail(true).with(Type.BALL).with(Type.BALL_LARGE).with(Type.STAR).withColor(Color.ORANGE).withColor(Color.YELLOW).withFade(Color.PURPLE).withFade(Color.RED).build());
+            	   	                fireWork.setFireworkMeta(fwMeta);
+                                    playerState.put(p, "done");
+                                    gachaItems.clear();
+                                    return;
+                		  }
+                	  }
+                  }
+                  }
+                   p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 2.0F);
+              	   if(inv.getItem(13).getItemMeta().getDisplayName() == null) {
+                  	p.sendMessage(prefix+"§e§l"+inv.getItem(13).getType().toString()+"§eが§e§l"+inv.getItem(13).getAmount()+"§e個当たりました！");
+              	   }else{
+              	    p.sendMessage(prefix+"§r"+inv.getItem(13).getItemMeta().getDisplayName().toString()+"§eが§e§l"+inv.getItem(13).getAmount()+"§e個当たりました！");
+              	    }
                   playerState.put(p, "done");
                   gachaItems.clear();
                   	}
@@ -305,11 +389,12 @@ public class MKgacha extends JavaPlugin {
                 return;
             }
             e.setCancelled(true);
+            return;
         }else if (e.getClickedInventory().getName().equals("§6§l[§a§lMKgachaSET§6§l]")==true) {
-            if(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR){
+            if(e.getCurrentItem() == null){
                 return;
             }
-            if(e.getInventory().getItem(51).getType()==Material.BARRIER&&e.getSlot()==51) {
+            if(e.getCurrentItem().getType()==Material.BARRIER && e.getSlot()==51) {
             	Player p = (Player)e.getWhoClicked();
             	onchat.put(p, "taiki");
             	onchat2.put("MK", e.getClickedInventory().getItem(53).getItemMeta().getDisplayName());
@@ -326,7 +411,7 @@ public class MKgacha extends JavaPlugin {
 				if(config1.getString("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+".hand.item_money_1").equals("item")==true) {
             	config1.set("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+".hand.item_money_1","money");
 				}else {
-				config1.set("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+".hand.item_money_1","item");	
+				config1.set("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+".hand.item_money_1","item");
 				}
 				config1.set("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+".hand.item_money",null);
 				saveConfig();
@@ -341,6 +426,35 @@ public class MKgacha extends JavaPlugin {
             	return;
             }
             return;
+        }else if(e.getClickedInventory().getName().equals("§6§l[§a§lMKgachaCONFIG§6§l]")==true){
+        	Player p = (Player)e.getWhoClicked();
+            if(e.getCurrentItem() == null){
+                return;
+            }
+            if(e.getCurrentItem().getType()==Material.EMERALD_BLOCK && e.getSlot()==11) {
+            	e.setCancelled(true);
+				 ItemStack a = new ItemStack(Material.REDSTONE_BLOCK);
+				 ItemMeta b =a.getItemMeta();
+				 b.setDisplayName("§4§l停止中");
+				 a.setItemMeta(b);
+				 e.getInventory().setItem(11, a);
+				 config1.set("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+".move", "false");
+				 saveConfig();
+				 p.sendMessage(prefix+"§4"+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+"ガチャを稼働停止しました。");
+				 return;
+            }else if(e.getCurrentItem().getType()==Material.REDSTONE_BLOCK && e.getSlot()==11) {
+            	e.setCancelled(true);
+				 ItemStack a = new ItemStack(Material.EMERALD_BLOCK);
+				 ItemMeta o =a.getItemMeta();
+				 o.setDisplayName("§a§l稼働中");
+				 a.setItemMeta(o);
+				 e.getInventory().setItem(11, a);
+				 config1.set("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+".move", "true");
+				 saveConfig();
+				 p.sendMessage(prefix+"§a"+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+"ガチャを稼働しました。");
+				 return;
+            }
+        	return;
         }else {
         	return;
         }
@@ -359,7 +473,8 @@ public class MKgacha extends JavaPlugin {
                     saveConfig();
                 }
                 e.setLine(0,"§b===============");
-                e.setLine(2,"§b===============");
+                e.setLine(2, e.getLine(2).replace("&", "§"));
+                e.setLine(3,"§b===============");
                 e.getPlayer().sendMessage("§a§l看板を登録しました");
 
             }
@@ -383,9 +498,7 @@ public class MKgacha extends JavaPlugin {
     }
     @EventHandler
     public void onCloseInventory(InventoryCloseEvent e){
-    	if(e.getInventory().getName().equals("§6§l[§a§lMKgachaSET§6§l]")==false) {
-    		return;
-    	}
+    	if(e.getInventory().getName().equals("§6§l[§a§lMKgachaSET§6§l]")==true) {
     	String id = e.getInventory().getItem(53).getItemMeta().getDisplayName().toString();
     	if(e.getInventory().getItem(51)!=null) {
          if(e.getInventory().getItem(51).getType()==Material.BARRIER) {
@@ -414,6 +527,20 @@ public class MKgacha extends JavaPlugin {
     	}
     	saveConfig();
     	e.getPlayer().sendMessage(prefix + "§a設定を保存しました。");
+    	return;
+    	}else if(e.getInventory().getName().equals("§6§l[§a§lMKgachaCONFIG§6§l]")==true) {
+    		String id = e.getInventory().getItem(53).getItemMeta().getDisplayName().toString();
+    		if(e.getInventory().getItem(13)!=null) {
+    			config1.set("gacha." + id +".winitem", e.getInventory().getItem(13));
+        	}else {
+        		config1.set("gacha." + id +".winitem", null);
+        	}
+        	saveConfig();
+        	e.getPlayer().sendMessage(prefix + "§a設定を保存しました。");
+    		return;
+    	}else {
+    		return;
+    	}
     }
 	@EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
