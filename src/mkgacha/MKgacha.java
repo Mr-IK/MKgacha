@@ -473,7 +473,7 @@ public class MKgacha extends JavaPlugin {
                     saveConfig();
                 }
                 e.setLine(0,"§b===============");
-                if(e.getLine(2)!=null) {
+                if(e.getLine(2).isEmpty()==false) {
                 e.setLine(2, e.getLine(2).replace("&", "§"));
                 e.setLine(3,"§b===============");
                 }else {
