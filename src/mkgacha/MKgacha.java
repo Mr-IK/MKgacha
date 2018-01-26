@@ -53,7 +53,7 @@ public class MKgacha extends JavaPlugin {
 			  sender.sendMessage(" /mkgacha set ガチャ名  => セッティングはこれ一つで！");
 			  sender.sendMessage(" /mkgacha list  => ガチャリスト");
 			  sender.sendMessage(" /mkgacha を /mg にしても機能します！");
-			  sender.sendMessage("=======§a§kaaa§6§l====v1.3.1====§a§kaaa§r=======");
+			  sender.sendMessage("=======§a§kaaa§6§l====v1.3.2====§a§kaaa§r=======");
 			  return true;
 			  } else if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("reload")) {
@@ -166,7 +166,7 @@ public class MKgacha extends JavaPlugin {
 		reloadConfig();
 		getLogger().info("===============MKgacha===============");
 		getLogger().info("see you!");
-		getLogger().info("===============v1.3.1===============");
+		getLogger().info("===============v1.3.2===============");
 		super.onDisable();
 	}
 
@@ -186,7 +186,7 @@ public class MKgacha extends JavaPlugin {
 		getLogger().info("最新の更新: https://youtu.be/T__pfDN6zH0");
 		getLogger().info("v1.3.0 最新要素: /mkgacha set ガチャ名");
 		getLogger().info("困った時は /mkgacha");
-		getLogger().info("===============v1.3.1===============");
+		getLogger().info("===============v1.3.2===============");
 		super.onEnable();
 	}
     public class signclick implements Listener{
@@ -473,9 +473,13 @@ public class MKgacha extends JavaPlugin {
                     saveConfig();
                 }
                 e.setLine(0,"§b===============");
+                if(e.getLine(2)!=null) {
                 e.setLine(2, e.getLine(2).replace("&", "§"));
                 e.setLine(3,"§b===============");
-                e.getPlayer().sendMessage("§a§l看板を登録しました");
+                }else {
+                	 e.setLine(2,"§b===============");
+                }
+                e.getPlayer().sendMessage(prefix+"§a§l看板を登録しました。");
 
             }
     }
