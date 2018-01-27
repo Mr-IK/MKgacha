@@ -422,6 +422,7 @@ public class MKgacha extends JavaPlugin {
             	config1.set("gacha."+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName(), null);
             	saveConfig();
             	e.getWhoClicked().sendMessage(prefix+"§4"+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+"ガチャを削除しました。");
+            	e.getInventory().setItem(53,null);
             	e.getWhoClicked().closeInventory();
             	return;
             }
@@ -503,6 +504,9 @@ public class MKgacha extends JavaPlugin {
     @EventHandler
     public void onCloseInventory(InventoryCloseEvent e){
     	if(e.getInventory().getName().equals("§6§l[§a§lMKgachaSET§6§l]")==true) {
+        if(e.getInventory().getItem(53)==null) {
+        	return;
+        }
     	String id = e.getInventory().getItem(53).getItemMeta().getDisplayName().toString();
     	if(e.getInventory().getItem(51)!=null) {
          if(e.getInventory().getItem(51).getType()==Material.BARRIER) {
