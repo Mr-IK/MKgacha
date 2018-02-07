@@ -43,27 +43,27 @@ public class MKgacha extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(!sender.hasPermission("mkgacha.config")){
-            sender.sendMessage(prefix + "§4あなたにガチャを作る権限はありません！");
+            sender.sendMessage(prefix + config2.getString("message.notper").replace("&", "§"));
             return true;
         }
 		Player p = (Player)sender;
 		if(args.length == 0) {
-			  sender.sendMessage("======="+prefix+"=======");
-			  sender.sendMessage(" /mkgacha reload ==> MKgachaのconfigをreload");
-			  sender.sendMessage(" /mkgacha set ガチャ名  => セッティングはこれ一つで！");
-			  sender.sendMessage(" /mkgacha list  => ガチャリスト");
-			  sender.sendMessage(" /mkgacha を /mg にしても機能します！");
-			  sender.sendMessage("=======§a§kaaa§6§l====v1.3.2====§a§kaaa§r=======");
+			  sender.sendMessage("=======mkgacha=======");
+              sender.sendMessage ("/mkgacha reload ==> Reload MKgacha setting!");
+              sender.sendMessage ("/mkgacha set gacha => With this one setting!");
+              sender.sendMessage ("/mkgacha list => gacha list");
+              sender.sendMessage ("/mkgacha also works for /mg !");
+			  sender.sendMessage("=======§a§kaaa§6§l====v2.0.0====§a§kaaa§r=======");
 			  return true;
 			  } else if(args.length == 1) {
 					if(args[0].equalsIgnoreCase("reload")) {
 				        getServer().getPluginManager().disablePlugin(this);
 				        getServer().getPluginManager().enablePlugin(this);
-						sender.sendMessage(prefix+"§a再起動完了。");
+						sender.sendMessage(prefix+config2.getString("message.restart").replace("&", "§"));
 						return true;
 				    }
 					if(args[0].equalsIgnoreCase("list")) {
-						sender.sendMessage(prefix+"[ガチャリスト]");
+						sender.sendMessage(prefix+"[gachalist]");
 						for (String key : config1.getConfigurationSection("gacha").getKeys(false)) {
 							sender.sendMessage(prefix+key);
 						}
@@ -71,7 +71,7 @@ public class MKgacha extends JavaPlugin {
 			  } else if(args.length == 2) {
 				if(args[0].equalsIgnoreCase("set")) {
 					if(config1.contains("gacha."+args[1]) == false){
-						sender.sendMessage(prefix+"§4そのガチャは存在しません！");
+						sender.sendMessage(prefix+config2.getString("message.notgacha").replace("&", "§"));
 						return true;
 					}
 					Inventory inv = Bukkit.createInventory((InventoryHolder)null, 54, "§6§l[§a§lMKgachaSET§6§l]");
@@ -119,7 +119,7 @@ public class MKgacha extends JavaPlugin {
 				}
 				if(args[0].equalsIgnoreCase("config")) {
 					if(config1.contains("gacha."+args[1]) == false){
-						sender.sendMessage(prefix+"§4そのガチャは存在しません！");
+						sender.sendMessage(prefix+config2.getString("message.notgacha").replace("&", "§"));
 						return true;
 					}
 					Inventory inv = Bukkit.createInventory((InventoryHolder)null, 54, "§6§l[§a§lMKgachaCONFIG§6§l]");
@@ -128,10 +128,6 @@ public class MKgacha extends JavaPlugin {
 					 c.setDisplayName(args[1]);
 					 b.setItemMeta(c);
 					 inv.setItem(53, b);
-					if(config1.contains("gacha."+args[1]+".move")==false) {
-						config1.set("gacha."+args[1]+".move","true");
-						saveConfig();
-					}
 					if(config1.getString("gacha."+args[1]+".move").equals("true")) {
 					 ItemStack a = new ItemStack(Material.EMERALD_BLOCK);
 					 ItemMeta o =a.getItemMeta();
@@ -149,6 +145,14 @@ public class MKgacha extends JavaPlugin {
 						ItemStack item2 = config1.getItemStack("gacha." + args[1] +".winitem");
 						inv.setItem(13, item2);
 					}
+					ItemStack eGlass = new ItemStack(Material.STAINED_GLASS_PANE,1, (byte) 4);
+					ItemMeta eGlassm = eGlass.getItemMeta();
+					eGlassm.setDisplayName("§6§l大当たりアイテム");
+					eGlass.setItemMeta(eGlassm);
+		              inv.setItem(4, eGlass);
+		              inv.setItem(22, eGlass);
+		              inv.setItem(12, eGlass);
+		              inv.setItem(14, eGlass);
 					p.openInventory(inv);
 				}
 			  }
@@ -159,22 +163,31 @@ public class MKgacha extends JavaPlugin {
 	private HashMap<String,String> onchat2;
 	HashMap<String,ItemStack> gachaItems = new HashMap<>();
 	public static FileConfiguration config1;
-	String prefix = "§6§l[§a§lMKgacha§6§l]§r";
+	public static FileConfiguration config2;
+	String prefix;
+	Message config3;
 	@Override
 	public void onDisable() {
 		saveConfig();
 		reloadConfig();
 		getLogger().info("===============MKgacha===============");
 		getLogger().info("see you!");
-		getLogger().info("===============v1.3.2===============");
+		getLogger().info("===============v1.9.0===============");
 		super.onDisable();
 	}
 
 	@Override
 	public void onEnable() {
+        new Message(this);
 	    saveDefaultConfig();
 	    FileConfiguration config = getConfig();
         config1 = config;
+        config3 = new Message(this, "message.yml");
+        config3.saveDefaultConfig();
+        FileConfiguration config4 = config3.getConfig();
+        config2 = config4;
+        String g = config2.getString("message.prefix")+"§r";
+        prefix = g.replace("&", "§");
         new signclick(this);
         new Vault(this);
         playerState = new HashMap<>();
@@ -184,9 +197,9 @@ public class MKgacha extends JavaPlugin {
         getCommand("mg").setExecutor(this);
 		getLogger().info("===============MKgacha===============");
 		getLogger().info("最新の更新: https://youtu.be/T__pfDN6zH0");
-		getLogger().info("v1.3.0 最新要素: /mkgacha set ガチャ名");
+		getLogger().info("v2.0.0 最新要素: /mkgacha set ガチャ名");
 		getLogger().info("困った時は /mkgacha");
-		getLogger().info("===============v1.3.2===============");
+		getLogger().info("===============v2.0.0===============");
 		super.onEnable();
 	}
     public class signclick implements Listener{
@@ -202,33 +215,33 @@ public class MKgacha extends JavaPlugin {
             	if (((Sign) e.getClickedBlock().getState()).getLine(0).contains("§b===============")) {
             		String id = ((Sign) e.getClickedBlock().getState()).getLine(1);
 				   if(config1.contains("gacha." + id) == false) {
-				     p.sendMessage(prefix+"§4エラー: その名前のガチャはありません!");
+				     p.sendMessage(prefix+config2.getString("message.notgacha").replace("&", "§"));
 				     return;
 				     }
 				   if(config1.contains("gacha." + id + ".item.1") == false) {
-					     p.sendMessage(prefix+"§4エラー: 設定が終了していません！");
+					     p.sendMessage(prefix+config2.getString("message.notset").replace("&", "§"));
 					     return;
 					     }
 				   if(config1.contains("gacha." + id + ".hand.item_money_1") == false) {
-					     p.sendMessage(prefix+"§4エラー: 設定が終了していません！");
+					     p.sendMessage(prefix+config2.getString("message.notset").replace("&", "§"));
 					     return;
 				   }
 				   if(config1.contains("gacha." + id + ".move")==true) {
 				   if(config1.getString("gacha." + id + ".move") == "false") {
-					     p.sendMessage(prefix+"§4このガチャは現在稼働が停止されています！");
+					     p.sendMessage(prefix+config2.getString("message.notmove").replace("&", "§"));
 					     return;
 				    }
 				   }else {
-					     p.sendMessage(prefix+"§4エラー: 設定を行ってください。 /mkgacha config "+id);
-					     return;
+							config1.set("gacha."+id+".move","true");
+							saveConfig();
 				   }
 	                if(!e.getPlayer().hasPermission("mkgacha.use")){
-	                    e.getPlayer().sendMessage(prefix + "§4あなたにガチャを引く権限はありません！");
+	                    e.getPlayer().sendMessage(prefix +config2.getString("message.notperuse").replace("&", "§"));
 	                    return;
 	                }
 	                if (!playerState.isEmpty()) {
 	                    if (playerState.get(p) != null && playerState.get(e.getPlayer()).equalsIgnoreCase("rolling")) {
-	                        p.sendMessage(prefix+"§4エラー:ガチャは1度に１回しかできません!");
+	                        p.sendMessage(prefix+config2.getString("message.breaktime").replace("&", "§"));
 	                        return;
 	                    }
 
@@ -237,48 +250,54 @@ public class MKgacha extends JavaPlugin {
 	                ItemStack i = config1.getItemStack("gacha." + id +".hand.item_money");
 	                int am = i.getAmount();
 	                ItemStack hand = p.getInventory().getItemInMainHand();
+	                String few = config2.getString("message.few").replace("&", "§");
+	                String few2 = few.replace("<ammount>", i.getAmount()+"");
 	                if(hand.getAmount() < i.getAmount()){
 	                	if(i.getItemMeta().getDisplayName() == null) {
-	                	p.sendMessage(prefix+"§4エラー: §e§l"+i.getType().toString()+"§4が§e§l"+i.getAmount()+"§4個必要です！");
+	                	p.sendMessage(prefix+few2.replace("<item>", i.getType().toString()));
 	                	}else{
-	                	p.sendMessage(prefix+"§4エラー: §e§l"+i.getItemMeta().getDisplayName().toString()+"§4が§e§l"+i.getAmount()+"§4個必要です！");
+	                	p.sendMessage(prefix+few2.replace("<item>", i.getItemMeta().getDisplayName().toString()));
 	                	}
 	                	return;
 	                }
 	                if(hand.getType() != i.getType()){
 	                	if(i.getItemMeta().getDisplayName() == null) {
-	                	p.sendMessage(prefix+"§4エラー: §e§l"+i.getType().toString()+"§4が§e§l"+i.getAmount()+"§4個必要です！");
+	                	p.sendMessage(prefix+few2.replace("<item>", i.getType().toString()));
 	                	}else{
-	                	p.sendMessage(prefix+"§4エラー: §e§l"+i.getItemMeta().getDisplayName().toString()+"§4が§e§l"+i.getAmount()+"§4個必要です！");
+	                	p.sendMessage(prefix+few2.replace("<item>", i.getItemMeta().getDisplayName().toString()));
 	                	}
 	                	return;
 	                }
+	                String use = config2.getString("message.use").replace("&", "§");
+	                String use2 = use.replace("<ammount>", i.getAmount()+"");
 	                if(i.getItemMeta() == null || hand.getItemMeta().toString().equalsIgnoreCase(i.getItemMeta().toString())){
 	                hand.setAmount(hand.getAmount() - am);
 	                if(i.getItemMeta() == null) {
-	                	p.sendMessage(prefix+"§e§l"+i.getType().toString()+"§aを§e§l"+i.getAmount()+"§a個支払いました。");
+	                	p.sendMessage(prefix+use2.replace("<item>", i.getType().toString()));
 	                }else if(i.getItemMeta().getDisplayName() == null) {
-                	p.sendMessage(prefix+"§e§l"+i.getType().toString()+"§aを§e§l"+i.getAmount()+"§a個支払いました。");
+                	p.sendMessage(prefix+use2.replace("<item>", i.getType().toString()));
                 	}else{
-                	p.sendMessage(prefix+i.getItemMeta().getDisplayName().toString()+"§aを§e§l"+i.getAmount()+"§a個支払いました。");
+                	p.sendMessage(prefix+use2.replace("<item>",i.getItemMeta().getDisplayName().toString()));
                 	}
 	                }else {
 	                	if(i.getItemMeta().getDisplayName() == null) {
-	                	p.sendMessage(prefix+"§4エラー: §e§l"+i.getType().toString()+"§4が§e§l"+i.getAmount()+"§4個必要です！");
+	                	p.sendMessage(prefix+use2.replace("<item>", i.getType().toString()));
 	                	}else{
-	                	p.sendMessage(prefix+"§4エラー: §e§l"+i.getItemMeta().getDisplayName().toString()+"§4が§e§l"+i.getAmount()+"§4個必要です！");
+	                	p.sendMessage(prefix+use2.replace("<item>", i.getItemMeta().getDisplayName().toString()));
 	                	}
 	                	return;
 	                }
 	                }else if(config1.getString("gacha."+id+".hand.item_money_1").equals("money")==true) {
 	                	double a = Vault.economy.getBalance(p);
 	                	double b = config1.getDouble("gacha."+id+".hand.item_money");
+	                	String few = config2.getString("message.fewmoney").replace("&", "§");
 	                	if(a<b) {
-	                		p.sendMessage(prefix+"§4エラー: §e§l$"+b+"必要です！");
+	                		p.sendMessage(prefix+few.replace("<money>",b+""));
 	                		return;
 	                	}
+	                	String few3 = config2.getString("message.usemoney").replace("&", "§");
 	                	Vault.economy.withdrawPlayer(p, b);
-	                	p.sendMessage(prefix+"§e§l$"+b+"§a支払いました。");
+	                	p.sendMessage(prefix+few3.replace("<money>",b+""));
 	                }
 	                for (String key : config1.getConfigurationSection("gacha."+id+".item").getKeys(false)) {
 	                	gachaItems.put(key,config1.getItemStack("gacha."+id+".item."+ key));
@@ -340,9 +359,9 @@ public class MKgacha extends JavaPlugin {
                 	  if(item.getType() == item2.getType()){
                 		  if(item2.getItemMeta() == null || item.getItemMeta().toString().equalsIgnoreCase(item2.getItemMeta().toString())){
                          	        if(inv.getItem(13).getItemMeta().getDisplayName() == null) {
-                         		     Bukkit.broadcastMessage(prefix+"§e§l"+p.getName().toString()+"さんが"+inv.getItem(13).getType().toString()+"§eを§e§l"+inv.getItem(13).getAmount()+"§e個当てました！おめでとう！");
+                         		     Bukkit.broadcastMessage(prefix+config2.getString("message.jackpot").replace("&", "§").replace("<user_name>", p.getName().toString()).replace("<item>", inv.getItem(13).getType().toString()).replace("<ammount>", inv.getItem(13).getAmount()+""));
                              	    }else{
-                             		 Bukkit.broadcastMessage(prefix+"§6§l"+p.getName().toString()+"さんが"+inv.getItem(13).getItemMeta().getDisplayName().toString()+"§eを§e§l"+inv.getItem(13).getAmount()+"§e個当てました！おめでとう！");
+                             	    	Bukkit.broadcastMessage(prefix+config2.getString("message.jackpot").replace("&", "§").replace("<user_name>", p.getName().toString()).replace("<item>", inv.getItem(13).getItemMeta().getDisplayName().toString()).replace("<ammount>", inv.getItem(13).getAmount()+""));
                              	    }
                                 	for (Player player : Bukkit.getOnlinePlayers()) {
                      	            	player.getWorld().playSound(player.getLocation(),Sound.ENTITY_ENDERDRAGON_DEATH, 1.0F, 2.0F);
@@ -365,9 +384,9 @@ public class MKgacha extends JavaPlugin {
                   }
                    p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 2.0F);
               	   if(inv.getItem(13).getItemMeta().getDisplayName() == null) {
-                  	p.sendMessage(prefix+"§e§l"+inv.getItem(13).getType().toString()+"§eが§e§l"+inv.getItem(13).getAmount()+"§e個当たりました！");
+                  	p.sendMessage(prefix+config2.getString("message.normal").replace("&", "§").replace("<item>",inv.getItem(13).getType().toString()).replace("<ammount>", inv.getItem(13).getAmount()+""));
               	   }else{
-              	    p.sendMessage(prefix+"§r"+inv.getItem(13).getItemMeta().getDisplayName().toString()+"§eが§e§l"+inv.getItem(13).getAmount()+"§e個当たりました！");
+              	    p.sendMessage(prefix+config2.getString("message.normal").replace("&", "§").replace("<item>",inv.getItem(13).getItemMeta().getDisplayName().toString()).replace("<ammount>", inv.getItem(13).getAmount()+""));
               	    }
                   playerState.put(p, "done");
                   gachaItems.clear();
@@ -383,14 +402,20 @@ public class MKgacha extends JavaPlugin {
     public void OnClick(InventoryClickEvent e){
     	if(e.getInventory().getLocation() != null) {
     		  return;
-    		}
-        if (e.getClickedInventory().getName().equals("§6§l[§a§lMKgacha§6§l]")==true) {
-            if(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR){
+    	}
+        if(playerState.get(e.getWhoClicked()) != null) {
+            if(playerState.get(e.getWhoClicked()).equalsIgnoreCase("done")){
+                e.setCancelled(true);
+                e.getWhoClicked().closeInventory();
+                playerState.remove(e.getWhoClicked());
                 return;
             }
-            e.setCancelled(true);
-            return;
-        }else if (e.getClickedInventory().getName().equals("§6§l[§a§lMKgachaSET§6§l]")==true) {
+            if (playerState.get(e.getWhoClicked()).equalsIgnoreCase("rolling")) {
+                e.setCancelled(true);
+                return;
+            }
+        }
+        if (e.getClickedInventory().getName().equals("§6§l[§a§lMKgachaSET§6§l]")==true) {
             if(e.getCurrentItem() == null){
                 return;
             }
@@ -455,6 +480,10 @@ public class MKgacha extends JavaPlugin {
 				 p.sendMessage(prefix+"§a"+e.getClickedInventory().getItem(53).getItemMeta().getDisplayName()+"ガチャを稼働しました。");
 				 return;
             }
+            if(e.getSlot() == 13){
+                return;
+            }
+            e.setCancelled(true);
         	return;
         }else {
         	return;
