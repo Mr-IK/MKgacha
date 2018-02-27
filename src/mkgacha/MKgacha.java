@@ -38,6 +38,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import red.man10.Vault;
+
 
 public class MKgacha extends JavaPlugin {
 	@Override
@@ -161,7 +163,7 @@ public class MKgacha extends JavaPlugin {
 	private HashMap<Player,String> playerState;
 	private HashMap<Player,String> onchat;
 	private HashMap<String,String> onchat2;
-	HashMap<String,ItemStack> gachaItems = new HashMap<>();
+	HashMap<String,ItemStack> gachaItems;
 	public static FileConfiguration config1;
 	public static FileConfiguration config2;
 	String prefix;
@@ -191,6 +193,7 @@ public class MKgacha extends JavaPlugin {
         new signclick(this);
         new Vault(this);
         playerState = new HashMap<>();
+        gachaItems = new HashMap<>();
         onchat = new HashMap<>();
         onchat2 = new HashMap<>();
         getCommand("mkgacha").setExecutor(this);
@@ -586,14 +589,6 @@ public class MKgacha extends JavaPlugin {
         if (!onchat.isEmpty()) {
             if (onchat.get(p) != null && onchat.get(e.getPlayer()).equalsIgnoreCase("taiki")) {
 				int i = 0;
-				try{
-                i = Integer.parseInt(m);
-				}catch (NumberFormatException f){
-				  p.sendMessage(prefix+"§4数字で入力してください。");
-				  onchat.put(p, "done");
-				  onchat2.clear();
-				  return;
-				}
 				String a =onchat2.get("MK");
 				config1.set("gacha."+a+".hand.item_money", i);
 				config1.set("gacha."+a+".hand.item_money_1", "money");

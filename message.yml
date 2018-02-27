@@ -1,0 +1,47 @@
+message:
+#すべての設定項目で '&' が '§' に変わります。
+#prefixはすべてのmkgachaに関する通知の一番左についてくる文字です。
+  prefix: '&6&l[&amkgacha&6&l]'
+
+#notperは設定するパーミッションがない時の通知です。
+  notper: '&4あなたにガチャを設定する権限はありません！'
+
+#restartはreload後の通知です。
+  restart: '&a再起動が完了しました。'
+
+#notgachaはガチャが存在しない場合の通知です。
+  notgacha: '&4そのガチャは存在しません！'
+
+#notsetは設定が終わっていないときの通知です。
+  notset: '&4設定が終了していません！'
+
+#notmoveは稼働停止時の通知です。
+  notmove: '&4このガチャは現在稼働が停止しています！'
+
+#notperuseはガチャを引く権限がない時の通知です。
+  notperuse: '&4あなたにガチャを引く権限がありません！'
+
+#breaktimeはガチャを連続で引こうとしたときの通知です。
+  breaktime: '&4ガチャは1度に1回しかできません！'
+
+#fewは違うアイテム、もしくは足りない数でガチャを引こうとしたときの通知です。
+#<item>は必要item名に <ammount>は必要個数に変換されます。
+  few: '&e&l<item>&4が&e&l<ammount>個&4必要です！'
+
+#useはガチャを引いたときに来る通知です。
+#<item>は必要item名に <ammount>は必要個数に変換されます。
+  use: '&e&l<item>&aを&e&l<ammount>個&a支払いました。'
+
+#fewmoneyはお金モード時足りない金額でガチャを引こうとしたときの通知です。
+#<money>は必要金額に変換されます。
+  fewmoney: '&e&l$<money>&4必要です。'
+
+#usemoneyはお金モード時ガチャを引いたときに来る通知です。
+#<money>は必要金額に変換されます。
+  usemoney: '&e&l$<money>&a支払いました。'
+#jackpotは大当たり時全体に向けて通知する内容です。
+#<user_name>は当てた人 <item>は当たったアイテム <ammount>は当たった個数に変換されます
+  jackpot: '&aおめでとうございます！&e&l<user_name>&aさんが&e&l<item>&aを&e&l<ammount>個&a当てました！'
+#normalは普通のあたり時の通知です。
+#<item>は当たったアイテム <ammount>は当たった個数に変換されます
+  normal: '&aおめでとうございます！&e&l<item>&aが&e&l<ammount>個&a当たりました！'
